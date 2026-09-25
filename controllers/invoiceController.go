@@ -3,6 +3,7 @@ package controllers
 import (
 	"CInvoice/services"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -65,6 +66,18 @@ func (ctrl *InvoiceController) MarkInvoiceAsPaid(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "invoice marked as paid"})
 }
 
+func (ctrl *InvoiceController) CreateClientInvoice(c *gin.Context) {
+	clientID := c.Param("id")
+
+	if err := ctrl.svc.CreateClientInvoice(clientID); err != nil {
+		log.Println("InvoiceController.CreateClientInvoice ERROR: ", err)
+		handleInvoiceSeviceError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "invoice created"})
+}
+
 func handleInvoiceSeviceError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, services.ErrInvoiceNotFound):
@@ -77,6 +90,8 @@ func handleInvoiceSeviceError(c *gin.Context, err error) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	case errors.Is(err, services.ErrInvoiceDelete):
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	case errors.Is(err, services.ERRInvoiceExists):
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"message": err.Error()})
 	default:
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "something went wrong, please try again later"})
 	}

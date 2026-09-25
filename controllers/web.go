@@ -22,8 +22,8 @@ func NewWebController(router *gin.Engine, embededTemplatesFS embed.FS) *WebContr
 		},
 	})
 
-	// router.LoadHTMLGlob("web/templates/*.html")
-	router.LoadHTMLFS(http.FS(embededTemplatesFS), "web/templates/*.html")
+	router.LoadHTMLGlob("web/templates/*.html")
+	// router.LoadHTMLFS(http.FS(embededTemplatesFS), "web/templates/*.html")
 
 	// ── Page routes ──
 	router.GET("/clients", Clients)

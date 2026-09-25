@@ -1,6 +1,6 @@
 # Civoice
 
-Client and invoice management system for security service contracts is a real world Project being use by a security company called Calvary Security.
+Client and invoice management system for security service contracts, This Project is being used by a security company called Calvary Security.
 Backend is a Go/Gin API with PostgreSQL; frontend is server-rendered Go templates (`html/template`) styled with Tailwind and Alpine.js. Invoices are recurring per client, auto-generated on a billing cycle, and exportable as PDF.
 
 ## Getting Started

@@ -14,6 +14,7 @@ func RegisterInvoiceRoutes(r *gin.RouterGroup) {
 		invoiceRoutes.GET("", invoiceCtrl.ListInvoices)
 		invoiceRoutes.GET("/:id", invoiceCtrl.GetInvoice)
 		invoiceRoutes.PATCH("/:id", invoiceCtrl.MarkInvoiceAsPaid)
+		invoiceRoutes.POST("/:id", invoiceCtrl.CreateClientInvoice)
 	}
 
 }

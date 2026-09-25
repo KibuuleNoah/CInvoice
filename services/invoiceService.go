@@ -25,6 +25,7 @@ func NewInvoiceService() *InvoiceService {
 
 var (
 	ErrInvoiceNotFound = errors.New("invoice record not found")
+	ERRInvoiceExists   = errors.New("invoice already exists")
 	ErrInvoiceCreate   = errors.New("failed creating invoice record")
 	ErrInvoiceUpdate   = errors.New("failed updating invoice record")
 	ErrInvoiceList     = errors.New("failed fetching invoices")
@@ -169,5 +170,37 @@ func (s *InvoiceService) MarkInvoiceAsPaid(id string) error {
 	if rows == 0 {
 		return ErrInvoiceNotFound
 	}
+	return nil
+}
+
+func (s *InvoiceService) CreateClientInvoice(clientID string) error {
+	res, err := s.cfg.DB.Exec("SELECT 1 FROM invoices WHERE invoice_number = 'INV-' || TO_CHAR(NOW(), 'YYYYMM') || '-' || SUBSTRING($1 FROM 1 FOR 6);", clientID)
+	if err != nil {
+		log.Println("InvoiceService.CreateClientInvoice ERROR: ", err)
+		return ErrInvoiceCreate
+	}
+
+	if rows, _ := res.RowsAffected(); rows == 1 {
+		return ERRInvoiceExists
+	}
+
+	res, err = s.cfg.DB.Exec(`
+    INSERT INTO invoices (client_id, invoice_number, amount, status, due_date, created_at, updated_at)
+    SELECT 
+        c.id,
+        'INV-' || TO_CHAR(NOW(), 'YYYYMM') || '-' || SUBSTRING(c.id FROM 1 FOR 6),
+        c.monthly_pay,
+        'pending',
+        DATE_TRUNC('month', NOW() + INTERVAL '1 month') + INTERVAL '4 day', 
+        EXTRACT(EPOCH FROM NOW()) * 1000,
+        EXTRACT(EPOCH FROM NOW()) * 1000
+    FROM clients c
+    WHERE c.id = $1`, clientID)
+
+	if rows, _ := res.RowsAffected(); rows == 0 {
+		log.Println("InvoiceService.CreateClientInvoice ERROR: ", err)
+		return ErrInvoiceCreate
+	}
+
 	return nil
 }

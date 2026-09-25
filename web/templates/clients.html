@@ -11,7 +11,7 @@
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Clients</h1>
     <button @click="openCreate()"
-      class="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/25 transition flex items-center space-x-2">
+      class="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-orange-500/25 transition flex items-center space-x-2">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
@@ -29,12 +29,12 @@
         </svg>
       </span>
       <input x-model="searchQuery" type="text" placeholder="Search client or contact"
-        class="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 transition shadow-sm">
+        class="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-orange-500 transition shadow-sm">
     </div>
     <div class="flex items-center space-x-2 text-xs text-slate-500 self-end sm:self-auto">
       <span>Showing</span>
       <select x-model.number="rowsPerPage" @change="currentPage = 1"
-        class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-500">
+        class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700 focus:outline-none focus:border-orange-500">
         <option value="10">10</option>
         <option value="25">25</option>
         <option value="50">50</option>
@@ -52,7 +52,7 @@
             class="border-b border-slate-200 bg-slate-50/60 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
             <th class="py-3 px-4 w-10 text-center">
               <input type="checkbox" @change="toggleSelectAll()" x-model="selectAll"
-                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer">
+                class="rounded border-slate-300 text-orange-600 focus:ring-orange-500 w-3.5 h-3.5 cursor-pointer">
             </th>
             <th class="py-3 px-4">Client</th>
             <th class="py-3 px-4">Contact</th>
@@ -69,7 +69,7 @@
             <tr class="hover:bg-slate-50/80 transition group">
               <td class="py-3.5 px-4 text-center">
                 <input type="checkbox" :value="cl.id" x-model="selectedClients"
-                  class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer">
+                  class="rounded border-slate-300 text-orange-600 focus:ring-orange-500 w-3.5 h-3.5 cursor-pointer">
 
               </td>
               <td class="py-3.5 px-4">
@@ -94,7 +94,7 @@
                     </path>
                   </svg>
                 </button>
-                <button @click="confirmDelete(cl)"
+                <button @click="createClientInvoice(cl.id,$event.currentTarget)"
                   class="p-1.5 rounded-lg hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 transition">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                     viewBox="0 0 24 24">
@@ -154,7 +154,7 @@
 
   <!-- Create/Edit Modal -->
   <div x-show="modalOpen" x-cloak x-transition.opacity
-    class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-40"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40"
     @keydown.escape.window="modalOpen = false">
     <div @click.outside="modalOpen = false" x-transition
       class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -167,56 +167,46 @@
           <div class="sm:col-span-2">
             <label class="text-xs font-semibold text-slate-600">Client Name</label>
             <input x-model="form.clientName" type="text"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <p class="text-[11px] text-rose-500 mt-1" x-show="errors.clientName" x-text="errors.clientName"></p>
           </div>
           <div class="sm:col-span-2">
             <label class="text-xs font-semibold text-slate-600">Address</label>
             <input x-model="form.address" type="text"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <p class="text-[11px] text-rose-500 mt-1" x-show="errors.address" x-text="errors.address"></p>
           </div>
           <div>
             <label class="text-xs font-semibold text-slate-600">Contact</label>
             <input x-model="form.contact" type="text"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <p class="text-[11px] text-rose-500 mt-1" x-show="errors.contact" x-text="errors.contact"></p>
           </div>
           <div>
             <label class="text-xs font-semibold text-slate-600">Start Date</label>
             <input x-model="form.startDate" type="date"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
             <p class="text-[11px] text-rose-500 mt-1" x-show="errors.startDate" x-text="errors.startDate"></p>
           </div>
           <div>
             <label class="text-xs font-semibold text-slate-600">Armed Unit Price</label>
             <input x-model.number="form.armedUnitPrice" type="number" min="1"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
           </div>
           <div>
             <label class="text-xs font-semibold text-slate-600">Armed Count</label>
             <input x-model.number="form.armedCount" type="number" min="1"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
           </div>
           <div>
             <label class="text-xs font-semibold text-slate-600">Unarmed Unit Price</label>
             <input x-model.number="form.unarmedUnitPrice" type="number" min="1"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
           </div>
           <div>
             <label class="text-xs font-semibold text-slate-600">Unarmed Count</label>
             <input x-model.number="form.unarmedCount" type="number" min="1"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
-          </div>
-          <div class="sm:col-span-2">
-            <label class="text-xs font-semibold text-slate-600">Total Guards</label>
-            <input x-model.number="form.totalGuards" type="number" min="1"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
-            <p class="text-[11px] text-slate-400 mt-1">
-              Suggested: <span x-text="(form.armedCount||0) + (form.unarmedCount||0)"></span>
-              <button type="button" class="underline ml-1"
-                @click="form.totalGuards = (form.armedCount||0) + (form.unarmedCount||0)">use</button>
-            </p>
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
           </div>
         </div>
         <div class="flex items-center justify-between pt-3 border-t border-slate-100">
@@ -226,7 +216,7 @@
             <button @click="modalOpen = false"
               class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
             <button @click="submitForm()" :disabled="saving"
-              class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 disabled:opacity-50">
+              class="px-4 py-2 rounded-xl bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 disabled:opacity-50">
               <span x-text="saving ? 'Saving...' : (editing ? 'Update Client' : 'Create Client')"></span>
             </button>
           </div>
@@ -257,7 +247,7 @@
   function emptyForm() {
     return {
       id: '', clientName: '', address: '', armedUnitPrice: null, armedCount: null,
-      unarmedUnitPrice: null, unarmedCount: null, totalGuards: null, startDate: '', contact: ''
+      unarmedUnitPrice: null, unarmedCount: null, startDate: '', contact: ''
     };
   }
 
@@ -382,6 +372,21 @@
           this.notify('Delete failed', true);
         }
       },
+
+      async createClientInvoice(clientID, btnElement) {
+        btnElement.style.display = 'none';
+
+        try {
+          const res = await fetch(`/api/v1/clients/${clientID}`, {method: 'POST'});
+          if (!res.ok) throw new Error();
+          this.deleteTarget = null;
+          await this.fetchClients();
+          this.notify('Client Invoice Created');
+        } catch {
+          this.notify('Invoice Already Exists', true);
+        }
+      },
+
 
       estTotal(c) {
         return (c.armedUnitPrice || 0) * (c.armedCount || 0) + (c.unarmedUnitPrice || 0) * (c.unarmedCount || 0);

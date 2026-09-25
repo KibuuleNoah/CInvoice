@@ -73,6 +73,7 @@ func main() {
 	controllers.NewWebController(r, embeddedTemplatesFS)
 	// Serve static files directly from the compiled binary
 	r.StaticFS("/static", http.FS(embeddedStaticFS))
+	// r.Static("/", "./static")
 
 	apiV1 := r.Group("/api/v1")
 	routes.RegisterRoutes(apiV1)
