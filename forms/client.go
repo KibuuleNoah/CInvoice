@@ -4,11 +4,11 @@ package forms
 type CreateClientForm struct {
 	ClientName       string `form:"client_name" json:"clientName" binding:"required,min=3,max=100"`
 	Address          string `form:"address" json:"address" binding:"required,min=3,max=200"`
-	ArmedUnitPrice   int    `form:"armed_unit_price" json:"armedUnitPrice" binding:"required,min=1"`
-	ArmedCount       int    `form:"armed_count" json:"armedCount" binding:"required,min=1"`
-	UnarmedUnitPrice int    `form:"unarmed_unit_price" json:"unarmedUnitPrice" binding:"required,min=1"`
-	UnarmedCount     int    `form:"unarmed_count" json:"unarmedCount" binding:"required,min=1"`
-	TotalGuards      int    `form:"total_guards" json:"totalGuards" binding:"required,min=1"`
+	ArmedUnitPrice   int    `form:"armed_unit_price" json:"armedUnitPrice" binding:"required"`
+	ArmedCount       int    `form:"armed_count" json:"armedCount" binding:"required"`
+	UnarmedUnitPrice int    `form:"unarmed_unit_price" json:"unarmedUnitPrice" binding:"required"`
+	UnarmedCount     int    `form:"unarmed_count" json:"unarmedCount" binding:"required"`
+	TotalGuards      *int   `form:"total_guards" json:"totalGuards" binding:"omitempty,min=1"`
 	StartDate        string `form:"start_date" json:"startDate" binding:"required"`
 	Contact          string `form:"contact" json:"contact" binding:"required,min=3,max=16"`
 }
@@ -18,10 +18,10 @@ type UpdateClientForm struct {
 	ID               string  `form:"id" json:"id" binding:"required,len=6"`
 	ClientName       *string `form:"client_name" json:"clientName" binding:"omitempty,min=3,max=100"`
 	Address          *string `form:"address" json:"address" binding:"omitempty,min=3,max=200"`
-	ArmedUnitPrice   *int    `form:"armed_unit_price" json:"armedUnitPrice" binding:"omitempty,min=1"`
-	ArmedCount       *int    `form:"armed_count" json:"armedCount" binding:"omitempty,min=1"`
-	UnarmedUnitPrice *int    `form:"unarmed_unit_price" json:"unarmedUnitPrice" binding:"omitempty,min=1"`
-	UnarmedCount     *int    `form:"unarmed_count" json:"unarmedCount" binding:"omitempty,min=1"`
+	ArmedUnitPrice   *int    `form:"armed_unit_price" json:"armedUnitPrice" binding:"omitempty"`
+	ArmedCount       *int    `form:"armed_count" json:"armedCount" binding:"omitempty"`
+	UnarmedUnitPrice *int    `form:"unarmed_unit_price" json:"unarmedUnitPrice" binding:"omitempty"`
+	UnarmedCount     *int    `form:"unarmed_count" json:"unarmedCount" binding:"omitempty"`
 	TotalGuards      *int    `form:"total_guards" json:"totalGuards" binding:"omitempty,min=1"`
 	StartDate        *string `form:"start_date" json:"startDate" binding:"omitempty"`
 	Contact          *string `form:"contact" json:"contact" binding:"omitempty,min=3,max=16"`

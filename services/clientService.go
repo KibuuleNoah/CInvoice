@@ -134,11 +134,7 @@ func (s *ClientService) UpdateClient(form forms.UpdateClientForm) (*models.Clien
 		args = append(args, *form.UnarmedCount)
 		i++
 	}
-	if form.TotalGuards != nil {
-		sets = append(sets, fmt.Sprintf("total_guards = $%d", i))
-		args = append(args, *form.TotalGuards)
-		i++
-	}
+
 	if form.StartDate != nil {
 		sets = append(sets, fmt.Sprintf("start_date = $%d", i))
 		args = append(args, *form.StartDate)
