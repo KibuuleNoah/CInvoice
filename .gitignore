@@ -1,0 +1,22 @@
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+
+# Logs #
+######################
+*.log
+
+# SENSITVE DATA #
+.gitconfig
+.env
+.env.production
+main_bootstrapgo
+cert/
+tmp/
+# BUILD #
+./gin-boilerplate
+token.json
+web/templates/node_modules
+db/migrations/00010_seed_clients_table.sql

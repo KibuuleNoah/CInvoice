@@ -1,0 +1,65 @@
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: civoice_postgres
+    restart: unless-stopped
+    environment:
+      ENV: PROD
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - civoice_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  goose_migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: civoice_migrations
+    command: goose -dir ./db/migrations postgres "host=postgres_db user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} sslmode=disable" up
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - civoice_network
+
+  gin_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: civoice_backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:${PORT}"
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+      - GIN_MODE=release
+      - DB_HOST=postgres_db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      goose_migrations:
+        condition: service_completed_successfully
+    networks:
+      - civoice_network
+
+volumes:
+  postgres_data:
+
+networks:
+  civoice_network:
+    driver: bridge
+    # external: true
+    # name: proxy-network

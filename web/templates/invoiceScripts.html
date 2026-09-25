@@ -1,0 +1,183 @@
+{{define "invoiceScripts"}}
+
+<script src="/static/static/js/jspdf.umd.min.js"></script>
+<script>
+  function generateInvoicePdf(invoice) {
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({unit: "pt", format: "a4"});
+
+    generateHeader(doc);
+    generateCustomerInformation(doc, invoice);
+    generateInvoiceTable(doc, invoice);
+    generateFooter(doc);
+
+    doc.save(invoice.invoiceNumber + ".pdf");
+  }
+
+  function generateHeader(doc) {
+    doc.addImage("data:image/png;base64,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", "PNG", 50, 45, 50, 50);
+    doc.setFontSize(18);
+    doc.setTextColor("#444444");
+    doc.setFont("helvetica", "bold");
+    doc.text("Calvary Security Services Limited", 545, 75, {align: "right"});
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+
+
+    doc.text("+256 200 926 040 | +256 791 987 232 | +256 761 715 387", 545, 90, {align: "right"});
+    doc.text("inf@calvarysecurity.ug", 545, 100, {align: "right"});
+    doc.text("www.calvarysecurity.ug", 545, 115, {align: "right"});
+    doc.text("Bulindo - Nsasa Road", 545, 125, {align: "right"});
+  }
+
+  function generateCustomerInformation(doc, invoice) {
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#FF5533");
+    doc.text("Invoice", 500, 160);
+
+    //generateHr(doc, 185);
+
+    const top = 200;
+
+    doc.setFillColor("#FF5533");
+    doc.rect(0, 180, 800, 90, "F");
+
+    doc.setTextColor("#FFFFFF");
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Invoice no:", 50, top);
+    doc.setFont("helvetica", "bold");
+    doc.text(String(invoice.invoiceNumber), 150, top);
+    doc.setFont("helvetica", "normal");
+    doc.text("Invoice Date:", 50, top + 15);
+    doc.text(formatDate(new Date(invoice.createdAt * 1000)), 150, top + 15);
+    doc.text("Due Date:", 50, top + 30);
+    doc.text(formatDate(new Date(invoice.dueDate)), 150, top + 30);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Balance Due:", 50, top + 49);
+    doc.text(formatCurrency(invoice.amount - (invoice.paid || 0)), 150, top + 49);
+    doc.setFont("helvetica", "normal");
+
+    doc.setFont("helvetica", "bold");
+    doc.text(invoice.client.clientName, 300, top);
+    doc.setFont("helvetica", "normal");
+    doc.text(invoice.client.address, 300, top + 15);
+    doc.text("Contact: " + invoice.client.contact, 300, top + 30);
+
+    //generateHr(doc, 262);
+  }
+  function generateInvoiceTable(doc, invoice) {
+    let i;
+    const invoiceTableTop = 340;
+    const {client} = invoice;
+
+    doc.setTextColor("#101010");
+    doc.setFont("helvetica", "bold");
+    generateTableRow(doc, invoiceTableTop, "Details", "", "", "VAT", "Sub Total");
+    generateHr(doc, invoiceTableTop + 20);
+    doc.setFont("helvetica", "normal");
+
+    const items = [
+      {
+        details: "Security Services",
+        armedGuards: " ",
+        unarmedGuards: " ",
+        vat: 0,
+        subTotal: invoice.amount
+      }
+    ];
+
+    for (i = 0; i < items.length; i++) {
+      const item = items[i];
+      const position = invoiceTableTop + (i + 1) * 30;
+      generateTableRow(
+        doc,
+        position,
+        item.details,
+        "",
+        "",
+        item.vat,
+        formatCurrency(item.subTotal)
+      );
+      generateHr(doc, position + 20);
+    }
+
+    const subtotalPosition = invoiceTableTop + (i + 1) * 30;
+    generateTableRow(doc, subtotalPosition, "", "", "Subtotal", "", formatCurrency(invoice.amount));
+
+    const duePosition = subtotalPosition + 25;
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#FF5533");
+    generateTableRow(doc, duePosition, "", "", "Balance Due", "", formatCurrency(invoice.amount - (invoice.paid || 0)));
+    doc.setTextColor("#444444");
+    doc.setFont("helvetica", "normal");
+  }
+
+  function generateFooter(doc) {
+    doc.addImage("data:image/png;base64,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", "PNG", 300, 500, 50, 50);
+    doc.setFontSize(10);
+    doc.setTextColor("#444444");
+    doc.text("Payment is due within 7 days. Thank you. How to pay ? Options below.", 297.5, 600, {align: "center"});
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#444444");
+    doc.text("Account: Stanbic Bank", 297.5, 640, {align: "center"});
+    doc.text("Account Number: 0930027466337", 297.5, 660, {align: "center"});
+    doc.text("Account Name: Calvary Security Services Limited", 297.5, 680, {align: "center"});
+  }
+
+  function generateTableRow(doc, y, item, description, unitCost, quantity, lineTotal) {
+    doc.setFontSize(10);
+    doc.text(String(item), 50, y);
+    doc.text(String(description), 150, y);
+    doc.text(String(unitCost), 370, y, {align: "right"});
+    doc.text(String(quantity), 460, y, {align: "right"});
+    doc.text(String(lineTotal), 545, y, {align: "right"});
+  }
+
+  function generateHr(doc, y) {
+    doc.setDrawColor("#aaaaaa");
+    doc.setLineWidth(1);
+    doc.line(50, y, 550, y);
+  }
+
+  function formatCurrency(val) {
+    return "UGX " + Number(val).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+
+  function formatDate(date) {
+    return date.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"});
+  }
+  function run() {
+    const invoice1 = {
+      "id": "xBzZIB",
+      "client": {
+        "id": "Z0fuGf",
+        "clientName": "Bolex ltd",
+        "address": "Wandegeya",
+        "armedUnitPrice": 450000,
+        "armedCount": 2,
+        "unarmedUnitPrice": 400000,
+        "unarmedCount": 6,
+        "totalGuards": 8,
+        "monthlyPay": 3300000,
+        "startDate": "2026-12-18T00:00:00Z",
+        "contact": "0781519092",
+        "createdAt": 1790154650,
+        "updatedAt": 1790154650
+      },
+      "invoiceNumber": "INV-202609-Z0fuGf",
+      "amount": 3300000,
+      "paid": 0,
+      "status": "pending",
+      "dueDate": "2026-10-05T00:00:00Z",
+      "createdAt": 1790224560,
+      "updatedAt": 1790224560
+    };
+
+    generateInvoicePdf(invoice1);
+  }
+</script>
+{{end}}

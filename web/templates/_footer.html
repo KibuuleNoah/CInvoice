@@ -1,0 +1,54 @@
+{{define "footer"}}
+</div>
+</main>
+
+<!-- Mobile Sidebar Drawer -->
+<div x-show="mobileSidebar" class="fixed inset-0 z-50 flex lg:hidden">
+  <div @click="mobileSidebar = false" x-show="mobileSidebar" x-transition.opacity
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+  <div x-show="mobileSidebar" x-transition:enter="transform transition ease-out duration-300"
+    x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+    x-transition:leave="transform transition ease-in duration-200" x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="-translate-x-full"
+    class="relative w-64 bg-white h-full shadow-2xl flex flex-col justify-between z-10">
+    <div>
+      <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">{{ .AgencyName | default "Filllo Design" }}</h2>
+            <p class="text-xs text-slate-500">Design Agency</p>
+          </div>
+        </div>
+        <button @click="mobileSidebar = false" class="p-1 text-slate-400 hover:text-slate-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-4 space-y-1">
+        <a href="#" class="block px-3 py-2 rounded-xl text-sm font-semibold text-blue-600 bg-blue-50">Invoices</a>
+        <a href="#"
+          class="block px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100">Dashboard</a>
+        <a href="#"
+          class="block px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100">Projects</a>
+        <a href="#" class="block px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100">Clients</a>
+      </div>
+    </div>
+    <div class="p-4 border-t border-slate-200">
+      <button @click="mobileSidebar = false"
+        class="w-full py-2 bg-slate-100 rounded-xl text-xs font-semibold text-slate-700">Close Menu</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</body>
+
+</html>
+{{end}}

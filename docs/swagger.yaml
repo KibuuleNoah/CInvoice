@@ -1,0 +1,330 @@
+definitions:
+  forms.AuthWithOTPForm:
+    properties:
+      otp:
+        type: string
+      userId:
+        type: string
+    required:
+    - otp
+    - userId
+    type: object
+  forms.CreateArticleForm:
+    properties:
+      author_id:
+        type: string
+      body:
+        minLength: 10
+        type: string
+      title:
+        maxLength: 200
+        minLength: 3
+        type: string
+    required:
+    - author_id
+    - body
+    - title
+    type: object
+  forms.RefreshTokenForm:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  forms.RequestOTPForm:
+    properties:
+      identifier:
+        type: string
+    required:
+    - identifier
+    type: object
+  forms.UpdateArticleForm:
+    properties:
+      body:
+        minLength: 10
+        type: string
+      published:
+        type: boolean
+      title:
+        maxLength: 200
+        minLength: 3
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  utils.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /articles:
+    get:
+      parameters:
+      - description: Max results (default 20, max 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List published articles
+      tags:
+      - articles
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateArticleForm'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Not Acceptable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create an article
+      tags:
+      - articles
+  /articles/{id}:
+    delete:
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an article
+      tags:
+      - articles
+    get:
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a single article
+      tags:
+      - articles
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/forms.UpdateArticleForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "406":
+          description: Not Acceptable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an article
+      tags:
+      - articles
+  /auth/logout:
+    get:
+      consumes:
+      - application/json
+      description: Logout User example
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Logout User example
+      tags:
+      - User
+  /auth/request-otp:
+    post:
+      consumes:
+      - application/json
+      description: Generates and sends a One-Time Password (OTP) to the user's email
+        or phone number.
+      parameters:
+      - description: User identifier (email or phone)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/forms.RequestOTPForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OTP and OTPID generated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid identifier or request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error generating OTP
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Request an OTP
+      tags:
+      - auth
+  /auth/token/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh Token example
+      parameters:
+      - description: Auth
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/forms.RefreshTokenForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Refresh Token example
+      tags:
+      - Auth
+  /auth/with-otp:
+    post:
+      consumes:
+      - application/json
+      description: Validates the OTP. On success, creates the user if they don't exist
+        and returns a JWT access token + refresh token (PocketBase-style).
+      parameters:
+      - description: OTP verification details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/forms.AuthWithOTPForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged in with user and token data
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Invalid login details or validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verify OTP and authenticate
+      tags:
+      - auth
+swagger: "2.0"

@@ -1,0 +1,195 @@
+{{define "header"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ .Title | default "Invoices Dashboard - Filllo Design" }}</title>
+  <!-- Tailwind CSS CDN -->
+  <link rel="stylesheet" href="/static/static/css/styles.css">
+  <!-- Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Custom scrollbar for clean dashboard look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-gradient-to-br from-orange-100 via-indigo-50/20 to-orange-200 min-h-screen text-orange-800 antialiased flex items-center justify-center">
+  <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 2000)" x-show="show"
+    x-transition:leave="transition ease-in duration-300" x-transition:leave-end="opacity-0"
+    class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center space-y-4">
+    <div class="relative w-12 h-12">
+      <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
+      <div class="absolute inset-0 rounded-full border-4 border-orange-600 border-t-transparent animate-spin"></div>
+    </div>
+    <span class="text-xs font-semibold text-slate-400 tracking-wide">Loading...</span>
+  </div>
+  <div class="w-full flex h-[100vh] overflow-hidden relative" x-data="{
+             activeTab: 'all',
+             searchQuery: '',
+             selectedInvoices: [],
+             selectAll: false,
+             currentPage: 1,
+             rowsPerPage: 15,
+             profileDropdown: false,
+             agencyDropdown: false,
+             mobileSidebar: false,
+                      }">
+
+    <!-- Sidebar -->
+    <aside
+      class="w-64 bg-orange-50 border-r border-orange-200 flex flex-col justify-between hidden lg:flex select-none">
+      <div>
+        <!-- Brand / Agency Dropdown Header -->
+        <div class="p-5 border-b border-orange-200 relative">
+          <div
+            class="flex items-center justify-between cursor-pointer p-1 rounded-xl hover:bg-orange-200/60 transition">
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold text-orange-900 leading-tight"> Calvary
+                </h2>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="px-4 py-5 space-y-1" x-data="{ currentPath: window.location.pathname }">
+
+          <!-- Clients Link -->
+          <a href="/clients"
+            :class="currentPath === '/clients' 
+       ? 'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-orange-600 bg-white shadow-sm border border-white transition' 
+       : 'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-orange-600 hover:bg-orange-200/50 transition'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <!--Boxicons v3.0.8 https://boxicons.com | License  https://docs.boxicons.com/free-->
+              <path
+                d="M12 11c1.71 0 3-1.29 3-3s-1.29-3-3-3-3 1.29-3 3 1.29 3 3 3m0-4c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1m1 5h-2c-2.76 0-5 2.24-5 5v.5c0 .83.67 1.5 1.5 1.5h9c.83 0 1.5-.67 1.5-1.5V17c0-2.76-2.24-5-5-5m-5 5c0-1.65 1.35-3 3-3h2c1.65 0 3 1.35 3 3zm-1.5-6c.47 0 .9-.12 1.27-.33a5.03 5.03 0 0 1-.42-4.52C7.09 6.06 6.8 6 6.5 6 5.06 6 4 7.06 4 8.5S5.06 11 6.5 11m-.39 1H5.5C3.57 12 2 13.57 2 15.5v1c0 .28.22.5.5.5H4c0-1.96.81-3.73 2.11-5m11.39-1c1.44 0 2.5-1.06 2.5-2.5S18.94 6 17.5 6c-.31 0-.59.06-.85.15a5.03 5.03 0 0 1-.42 4.52c.37.21.79.33 1.27.33m1 1h-.61A6.97 6.97 0 0 1 20 17h1.5c.28 0 .5-.22.5-.5v-1c0-1.93-1.57-3.5-3.5-3.5">
+              </path>
+            </svg> <span>Clients</span>
+          </a>
+
+          <!-- Invoices Link -->
+          <a href="/invoices"
+            :class="currentPath === '/invoices' 
+       ? 'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-orange-600 bg-white shadow-sm border border-white transition' 
+       : 'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-orange-600 hover:bg-orange-200/50 transition'">
+            <svg class="w-5 h-5" :class="currentPath === '/invoices' ? 'text-orange-600' : 'text-orange-400'"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Invoices</span>
+          </a>
+
+          <!-- Documents Link -->
+          <a href="/documents"
+            :class="currentPath === '/documents' 
+       ? 'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-blue-600 bg-blue-50/80 shadow-sm border border-blue-100/60 transition' 
+       : 'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-orange-600 hover:bg-orange-200/50 transition'">
+            <svg class="w-5 h-5" :class="currentPath === '/documents' ? 'text-blue-600' : 'text-orange-400'" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
+            </svg>
+            <span>Documents</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Footer Settings & Support -->
+      <div class="p-4 border-t border-orange-200 space-y-1">
+        <a href="#"
+          class="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium text-orange-600 hover:bg-orange-200/50 transition">
+          <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Settings</span>
+        </a>
+        <a href="#"
+          class="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium text-orange-600 hover:bg-orange-200/50 transition">
+          <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Support</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 bg-white overflow-y-auto">
+
+      <!-- Top Navigation Bar -->
+      <header class="border-b border-orange-200 p-5 lg:px-8 flex items-center justify-end bg-white sticky top-0 z-30">
+
+        <div class="flex items-center space-x-4 relative">
+          <div class="relative">
+            <button @click="profileDropdown = !profileDropdown"
+              class="flex items-center space-x-3 focus:outline-none bg-orange-50 border border-orange-200 hover:bg-orange-100 py-1.5 px-3 rounded-full transition">
+              <img
+                src="data:image/png;base64,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"
+                alt="Arafat Nayeem" class="w-7 h-7 rounded-full object-cover border border-orange-300">
+              <span class="text-xs font-semibold text-orange-800">{{ .UserName | default "Moxie Star" }}</span>
+              <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Profile Dropdown Menu -->
+            <div x-show="profileDropdown" @click.outside="profileDropdown = false" x-transition
+              class="absolute right-0 mt-2 w-48 bg-white border border-orange-200 rounded-2xl shadow-xl py-2 z-50">
+              <div class="px-4 py-2 border-b border-orange-100">
+                <p class="text-xs font-bold text-orange-900">{{ .UserName | default "Moxie Star" }}</p>
+                <p class="text-[11px] text-orange-500 truncate">moxie@fillladesign.com</p>
+              </div>
+              <a href="#" class="block px-4 py-2 text-xs text-orange-700 hover:bg-orange-50">Your Profile</a>
+              <div class="border-t border-orange-100 my-1"></div>
+              <a href="#" class="block px-4 py-2 text-xs text-rose-600 font-semibold hover:bg-rose-50">Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Inner Content -->
+      <div class="p-6 lg:p-8 space-y-6">
+        {{end}}
